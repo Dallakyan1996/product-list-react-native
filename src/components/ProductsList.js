@@ -1,26 +1,54 @@
-import React, { cloneElement } from "react"
-import { StyleSheet, View, Text, Button, TouchableOpacity } from "react-native"
-import ProductComponent from "./Product"
+import React, { useEffect, useState } from "react"
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
+import { ListItem } from 'react-native-elements'
+import { Icon } from 'react-native-elements'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const ProductsListComponent = ({ navigation }) => {
+    let _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('products');
+            console.log(value)
+            if (value !== null) {
+                setList(JSON.parse(value));
+            }
+        } catch (error) {
 
+        }
+    };
+    let [list, setList] = useState()
+    useEffect(() => {
+        _retrieveData()
+        console.log(true)
+    }, [])
     return <View>
-        <ProductComponent productName="Name" productPrice="300$" />
-        <ProductComponent productName="Name" productPrice="300$" />
-        <ProductComponent productName="Name" productPrice="300$" />
-        <ProductComponent productName="Name" productPrice="300$" />
-        <ProductComponent productName="Name" productPrice="300$" />
-        <ProductComponent productName="Name" productPrice="300$" />
+        {list &&
+            list.map((l, i) => (
+                <ListItem key={i} bottomDivider>
+                    <ListItem.Content style={styles.list} >
+                        <ListItem.Title>{l.name}</ListItem.Title>
+                        <Icon name='edit' onPress={() => {
+                        }} />
+                        <ListItem.Title>{l.subtitle}</ListItem.Title>
+                        <Icon name='edit' onPress={() => {
+                        }} />
+                    </ListItem.Content>
+                </ListItem>
+            ))
+        }
         <View style={styles.addBtnView}>
             <TouchableOpacity
-                onPress={() =>
-                    navigation.navigate('Add Product')
+                onPress={() => {
+                    navigation.navigate('Add Product', { list: list })
+                }
                 }
                 style={styles.roundButton2}>
                 <Text style={styles.addBtnText}>+ Add Product</Text>
             </TouchableOpacity>
         </View>
-    </View>
+    </View >
 }
 
 const styles = StyleSheet.create({
@@ -32,7 +60,6 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        // padding: 10,
         borderRadius: 50,
         backgroundColor: '#0a5bef',
     },
@@ -44,6 +71,11 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+    },
+    list: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
     }
 });
 

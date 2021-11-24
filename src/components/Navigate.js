@@ -14,7 +14,11 @@ const Navigate = () => {
                 <Stack.Screen
                     name="Home"
                     component={ProductsListComponent}
-                    options={{ title: 'Products List' }}
+                    options={{
+                        title: 'Products List', headerTitleStyle: {
+                            color: 'grey',
+                        }
+                    }}
                 />
                 <Stack.Screen name="Add Product" component={AddProductComponent} />
             </Stack.Navigator>
