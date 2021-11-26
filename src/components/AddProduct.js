@@ -1,40 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native"
 import { Input } from 'react-native-elements';
 import { Button } from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useProducts } from '../hooks/useProducts';
 
 
-const AddProductComponent = ({ route, navigation }) => {
+const AddProductComponent = ({ list, setList }) => {
 
-    let [products, setProducts] = useState()
-    let [a, setA] = useState()
+    const ref_input3 = useRef();
+    let [products, setProducts] = useProducts([])
     let _storeData = async (products) => {
         try {
-            await AsyncStorage.setItem('products', products);
+            await AsyncStorage.setItem('products', JSON.stringify(products));
         } catch (error) {
+            console.log("error")
         }
     };
     const [newProduct, setNewProduct] = useState({
-        product: "",
+        productName: "",
         price: ""
     })
+
     useEffect(() => {
-        setProducts(route.params.list)
-    }, [])
-    useEffect(() => {
-        _storeData(a)
-        console.log("listen")
-        console.log(a)
-    }, [a])
+        _storeData(products)
+    }, [products])
+
     return <View>
         <Input
             placeholder='Product Name'
             onChangeText={(e) => {
                 setNewProduct({
                     ...newProduct,
-                    product: e
+                    productName: e
                 })
             }}
+
         />
         <Input
             placeholder='Product Price'
@@ -44,18 +45,19 @@ const AddProductComponent = ({ route, navigation }) => {
                     price: e
                 })
             }}
+
         />
+
         <View style={styles.addBtnView}>
             <TouchableOpacity
-                style={styles.roundButton2}
+                ref={ref_input3}
                 onPress={() => {
-                    // console.log(newProduct)
-                    setA([...products, newProduct])
-                    // console.log(products)
-                    // navigation.navigate('Home')
-                }}
-            >
-                <Text style={styles.addBtnText}>+</Text>
+                    setProducts([...products, newProduct])
+                    ref_input3.current.focus()
+                }
+                }
+                style={styles.roundButton2}>
+                <Text style={styles.addBtnText}>+ Add Product</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -64,22 +66,28 @@ const AddProductComponent = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     roundButton2: {
         marginTop: 10,
-        width: 70,
-        height: 70,
+        marginBottom: 10,
+        display: "flex",
+        width: 150,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 10,
-        borderRadius: 100,
-        backgroundColor: '#124fb5e0'
+        borderRadius: 50,
+        backgroundColor: '#0a5bef',
     },
     addBtnText: {
-        fontSize: 25,
-        color: "white"
+        fontSize: 18,
+        color: 'white'
     },
     addBtnView: {
         display: "flex",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+    },
+    list: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
     }
 });
 export default AddProductComponent;

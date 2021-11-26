@@ -8,7 +8,8 @@ import Navigate from './src/components/Navigate';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Navigate />
+      {/* <Navigate /> */}
+      <ProductListComponent />
     </View>
   );
 }

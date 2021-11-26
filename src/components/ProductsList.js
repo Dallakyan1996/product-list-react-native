@@ -1,81 +1,65 @@
 import React, { useEffect, useState } from "react"
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Text, TouchableOpacity, Button, ScrollView } from "react-native"
 import { ListItem } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AddProductComponent from "./AddProduct";
 
 
+export const ProductContext = React.createContext()
 
-const ProductsListComponent = ({ navigation }) => {
-    let _retrieveData = async () => {
+const ProductsListComponent = () => {
+    let removeItemValue = async (key) => {
         try {
-            const value = await AsyncStorage.getItem('products');
-            console.log(value)
-            if (value !== null) {
-                setList(JSON.parse(value));
-            }
-        } catch (error) {
-
+            await AsyncStorage.removeItem(key);
+            return true;
         }
-    };
-    let [list, setList] = useState()
+        catch (exception) {
+            return false;
+        }
+    }
+    let [products, setProducts] = useState([])
     useEffect(() => {
-        _retrieveData()
-        console.log(true)
+        AsyncStorage.getItem('products')
+            .then((value) => {
+                const data = JSON.parse(value);
+                setList(data)
+                console.log(value)
+            });
     }, [])
-    return <View>
-        {list &&
-            list.map((l, i) => (
-                <ListItem key={i} bottomDivider>
-                    <ListItem.Content style={styles.list} >
-                        <ListItem.Title>{l.name}</ListItem.Title>
-                        <Icon name='edit' onPress={() => {
-                        }} />
-                        <ListItem.Title>{l.subtitle}</ListItem.Title>
-                        <Icon name='edit' onPress={() => {
-                        }} />
-                    </ListItem.Content>
-                </ListItem>
-            ))
-        }
-        <View style={styles.addBtnView}>
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate('Add Product', { list: list })
+    return <ProductContext.Provider value={[products, setProducts]}>
+        <View>
+            <AddProductComponent />
+            <ScrollView style={styles.scrollView}>
+                {products &&
+                    products.map((l, i) => (
+                        <ListItem key={i} bottomDivider>
+                            <ListItem.Content style={styles.list} >
+                                <ListItem.Title>{l["productName"]}</ListItem.Title>
+                                <Icon name='edit' onPress={() => {
+                                }} />
+                                <ListItem.Title>{l["price"]}</ListItem.Title>
+                                <Icon name='edit' onPress={() => {
+                                }} />
+                            </ListItem.Content>
+                        </ListItem>
+                    ))
                 }
-                }
-                style={styles.roundButton2}>
-                <Text style={styles.addBtnText}>+ Add Product</Text>
-            </TouchableOpacity>
-        </View>
-    </View >
+            </ScrollView>
+            <Button title="clear" onPress={() => {
+                // removeItemValue("products")
+                // console.log(route)
+            }} />
+        </View >
+    </ProductContext.Provider>
 }
 
 const styles = StyleSheet.create({
-
-    roundButton2: {
-        marginTop: 10,
-        display: "flex",
-        width: 150,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 50,
-        backgroundColor: '#0a5bef',
-    },
-    addBtnText: {
-        fontSize: 18,
-        color: 'white'
-    },
-    addBtnView: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
     list: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        marginBottom: 10
     }
 });
 
