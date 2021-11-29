@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native"
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, TextInput, TouchableOpacity, Text, Keyboard } from "react-native"
 import { Input } from 'react-native-elements';
 import { Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProducts } from '../hooks/useProducts';
 
 
-const AddProductComponent = ({ list, setList }) => {
+const AddProductComponent = () => {
 
-    const ref_input3 = useRef();
     let [products, setProducts] = useProducts([])
     let _storeData = async (products) => {
         try {
@@ -18,6 +17,7 @@ const AddProductComponent = ({ list, setList }) => {
         }
     };
     const [newProduct, setNewProduct] = useState({
+        id: null,
         productName: "",
         price: ""
     })
@@ -35,7 +35,8 @@ const AddProductComponent = ({ list, setList }) => {
                     productName: e
                 })
             }}
-
+            value={newProduct.productName}
+            style={styles.input}
         />
         <Input
             placeholder='Product Price'
@@ -45,19 +46,27 @@ const AddProductComponent = ({ list, setList }) => {
                     price: e
                 })
             }}
-
+            value={newProduct.price}
+            keyboardType="numeric"
+            style={styles.input}
         />
-
         <View style={styles.addBtnView}>
             <TouchableOpacity
-                ref={ref_input3}
                 onPress={() => {
-                    setProducts([...products, newProduct])
-                    ref_input3.current.focus()
+                    if (newProduct.price && newProduct.productName) {
+                        setProducts([...products, newProduct])
+                        setNewProduct({
+                            id: 10 * Math.random(),
+                            productName: "",
+                            price: ""
+                        })
+                        _storeData;
+                    }
+                    Keyboard.dismiss()
                 }
                 }
                 style={styles.roundButton2}>
-                <Text style={styles.addBtnText}>+ Add Product</Text>
+                <Text style={styles.addBtnText} >+ Add Product</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -73,7 +82,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
-        backgroundColor: '#0a5bef',
+        backgroundColor: '#3781e6',
     },
     addBtnText: {
         fontSize: 18,
@@ -84,10 +93,9 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    list: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between"
+    input: {
+        color: "#fff"
     }
+
 });
 export default AddProductComponent;
