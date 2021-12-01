@@ -5,10 +5,22 @@ import { Icon } from 'react-native-elements'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddProductComponent from "./AddProduct";
 import { ListItem, Avatar } from 'react-native-elements'
+import SumBtn from "./SumBtn";
 
 export const ProductContext = React.createContext()
 
 const ProductsListComponent = () => {
+    const _retrieveData = async () => {
+        try {
+            if (value !== null) {
+                const value = await AsyncStorage.getItem('products');
+                console.log(JSON.parse(value));
+                // We have data!!
+            }
+        } catch (error) {
+            // Error retrieving data
+        }
+    };
     // let removeItemValue = async (key) => {
     //     try {
     //         await AsyncStorage.removeItem(key);
@@ -20,17 +32,15 @@ const ProductsListComponent = () => {
     // }
     let [products, setProducts] = useState([])
     useEffect(() => {
-        AsyncStorage.getItem('products')
-            .then((value) => {
-                const data = JSON.parse(value);
-                // setList(data)
-                // console.log(value)
-            });
-    }, [])
+        _retrieveData()
+    }, [products])
     return <ProductContext.Provider value={[products, setProducts]}>
         <ScrollView style={styles.scrollView}>
             <View style={styles.productList}>
-                <AddProductComponent />
+                <View style={styles.test}>
+                    <AddProductComponent />
+                    <SumBtn />
+                </View>
                 {products &&
                     products.map((l, i) => (
                         <ListItem style={styles.listItem} key={l.id} >
@@ -65,6 +75,15 @@ const styles = StyleSheet.create({
     },
     productList: {
         padding: 10
+    },
+    btnsView: {
+        display: "flex",
+        flexDirection: "row"
+    },
+    test: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-around"
     }
 });
 
