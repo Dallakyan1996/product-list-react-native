@@ -1,67 +1,60 @@
 import React, { useEffect, useState } from "react"
 import { StyleSheet, View, Text, TouchableOpacity, Button, ScrollView } from "react-native"
-// import { ListItem } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AddProductComponent from "./AddProduct";
+import { AddProductComponent } from "./AddProduct";
 import { ListItem, Avatar } from 'react-native-elements'
 import SumBtn from "./SumBtn";
 
-export const ProductContext = React.createContext()
 
 const ProductsListComponent = () => {
-    const _retrieveData = async () => {
+    let [products, setProducts] = useState([])
+    let _storeData = async (products) => {
         try {
-            if (value !== null) {
-                const value = await AsyncStorage.getItem('products');
-                console.log(JSON.parse(value));
-                // We have data!!
-            }
+            await AsyncStorage.setItem('products', JSON.stringify(products));
         } catch (error) {
-            // Error retrieving data
+            console.log("error")
         }
     };
-    // let removeItemValue = async (key) => {
-    //     try {
-    //         await AsyncStorage.removeItem(key);
-    //         return true;
-    //     }
-    //     catch (exception) {
-    //         return false;
-    //     }
-    // }
-    let [products, setProducts] = useState([])
+    const _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('products');
+            if (value !== null) {
+                setProducts([...JSON.parse(value)])
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     useEffect(() => {
         _retrieveData()
-    }, [products])
-    return <ProductContext.Provider value={[products, setProducts]}>
-        <ScrollView style={styles.scrollView}>
-            <View style={styles.productList}>
-                <View style={styles.test}>
-                    <AddProductComponent />
-                    <SumBtn />
-                </View>
-                {products &&
-                    products.map((l, i) => (
-                        <ListItem style={styles.listItem} key={l.id} >
-                            <ListItem.Content style={styles.list} >
-                                <ListItem.Title>{l["productName"]}</ListItem.Title>
-                                <ListItem.Title>{l["price"]}</ListItem.Title>
-                                <Icon name='delete' onPress={() => {
-                                    products.splice(i, 1)
-                                    setProducts([...products])
-                                }} />
-                            </ListItem.Content>
-                        </ListItem>
-                    ))
-                }
-                {/* <Button title="clear" onPress={() => {
-                    // removeItemValue("products")
-                    // console.log(route)
-                }} /> */}
-            </View >
-        </ScrollView>
-    </ProductContext.Provider>
+    }, [])
+    return <ScrollView style={styles.scrollView}>
+        <View style={styles.productList}>
+            <View style={styles.test}>
+                <AddProductComponent products={products} setProducts={setProducts} />
+                <SumBtn products={products} />
+            </View>
+            {products &&
+                products.map((l, i) => (
+                    console.log(products),
+                    <ListItem style={styles.listItem} key={10 * Math.random()} >
+                        <ListItem.Content style={styles.list} >
+                            <ListItem.Title>{l["productName"]}</ListItem.Title>
+                            <ListItem.Title>{l["price"]}</ListItem.Title>
+                            <Icon name='delete' onPress={() => {
+                                products.splice(i, 1)
+                                setProducts([...products])
+                                _storeData([...products])
+
+                            }} />
+                        </ListItem.Content>
+                    </ListItem>
+                ))
+            }
+        </View >
+    </ScrollView>
 }
 
 const styles = StyleSheet.create({

@@ -1,35 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, View, TextInput, TouchableOpacity, Text, Keyboard, Pressable, } from "react-native";
-import { Input } from 'react-native-elements';
-import { Button } from 'react-native-elements';
+import { Alert, Modal, StyleSheet, View, TextInput, TouchableOpacity, Text, Keyboard, Pressable } from "react-native";
+import { Input } from 'react-native-elements'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useProducts } from '../hooks/useProducts';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { styles } from './modalStyle';
 
 
-const AddProductComponent = () => {
+export const AddProductComponent = ({ products, setProducts }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    let [products, setProducts] = useProducts([])
     let _storeData = async (products) => {
         try {
             await AsyncStorage.setItem('products', JSON.stringify(products));
-            console.log("wow")
         } catch (error) {
-            console.log("error")
+            console.log(error)
         }
     };
     const [newProduct, setNewProduct] = useState({
-        id: null,
         productName: "",
         price: ""
     })
+    const _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('products');
+            if (value !== null) {
+                setProducts([...JSON.parse(value)])
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+    useEffect(() => {
+        _retrieveData()
+    }, [])
 
-    // useEffect(() => {
-    //     // _storeData(products)
-    // }, [products])
-
-    return <View>
+    return <>
         <Modal
             animationType="slide"
             transparent={true}
@@ -62,7 +66,6 @@ const AddProductComponent = () => {
                     <Input
                         placeholder='Product Price'
                         onChangeText={(e) => {
-
                             setNewProduct({
                                 ...newProduct,
                                 price: e
@@ -82,17 +85,15 @@ const AddProductComponent = () => {
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
                         onPress={() => {
-                            setModalVisible(!modalVisible)
                             if (newProduct.price && newProduct.productName) {
                                 setProducts([...products, newProduct])
+                                _storeData([...products, newProduct])
                                 setNewProduct({
-                                    id: 10 * Math.random(),
                                     productName: "",
                                     price: ""
                                 })
-                                _storeData(products)
                             }
-                            // Keyboard.dismiss()
+                            setModalVisible(!modalVisible)
                         }}
                     >
                         <Text style={styles.textStyle}>+ Add</Text>
@@ -110,6 +111,5 @@ const AddProductComponent = () => {
                 <Text style={styles.addBtnText}>+ Add Product</Text>
             </TouchableOpacity>
         </View>
-    </View>
+    </>
 }
-export default AddProductComponent;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import ProductListComponent from './src/components/ProductsList';
+import ProductsListComponent from './src/components/ProductsList';
 import { Header } from 'react-native-elements';
 
 export default function App() {
@@ -13,7 +13,8 @@ export default function App() {
         statusBarProps={{ barStyle: 'light-content' }}
         barStyle="light-content"
       />
-      <ProductListComponent />
+      <ProductsListComponent />
+
     </View>
   );
 }
