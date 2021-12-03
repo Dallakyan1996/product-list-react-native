@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, Modal, TouchableOpacity, StyleSheet, Pressable } from "react-native";
+import { View, Text, Modal, TouchableOpacity, Pressable } from "react-native";
 import { styles } from './modalStyle';
 
 const SumBtn = ({ products }) => {

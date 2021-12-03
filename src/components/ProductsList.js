@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react"
-import { StyleSheet, View, Text, TouchableOpacity, Button, ScrollView } from "react-native"
-import { Icon } from 'react-native-elements'
+import { StyleSheet, View, Text, TouchableOpacity, Modal, ScrollView, Pressable } from "react-native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AddProductComponent } from "./AddProduct";
-import { ListItem, Avatar } from 'react-native-elements'
+import { ListItem, Icon, Button } from 'react-native-elements'
 import SumBtn from "./SumBtn";
+import { styles } from './modalStyle';
 
 
 const ProductsListComponent = () => {
     let [products, setProducts] = useState([])
+    let [info, setInfo] = useState("")
+    const [modalVisible, setModalVisible] = useState(false);
     let _storeData = async (products) => {
         try {
             await AsyncStorage.setItem('products', JSON.stringify(products));
@@ -31,6 +33,29 @@ const ProductsListComponent = () => {
         _retrieveData()
     }, [])
     return <ScrollView style={styles.scrollView}>
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+                Alert.alert("Modal has been closed.");
+                setModalVisible(!modalVisible);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                    <Text>{info}</Text>
+                    <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => {
+                            setModalVisible(!modalVisible)
+                        }}
+                    >
+                        <Text style={styles.textStyle}>Close</Text>
+                    </Pressable>
+                </View>
+            </View>
+        </Modal>
         <View style={styles.productList}>
             <View style={styles.test}>
                 <AddProductComponent products={products} setProducts={setProducts} />
@@ -38,46 +63,45 @@ const ProductsListComponent = () => {
             </View>
             {products &&
                 products.map((l, i) => (
-                    console.log(products),
-                    <ListItem style={styles.listItem} key={10 * Math.random()} >
-                        <ListItem.Content style={styles.list} >
+                    <ListItem.Swipeable
+                        key={10 * Math.random()}
+                        style={styles.product}
+                        leftContent={
+                            <Button
+                                title="Info"
+                                icon={{ name: 'info', color: 'white' }}
+                                buttonStyle={{ minHeight: '100%', marginTop: 2 }}
+                                onPress={() => {
+                                    setModalVisible(!modalVisible)
+                                    setInfo(l.info)
+                                }
+                                }
+                            />
+                        }
+                        rightContent={
+                            <Button
+                                title="Delete"
+                                icon={{ name: 'delete', color: 'white' }}
+                                buttonStyle={{ minHeight: "100%", backgroundColor: 'red', marginTop: 2 }}
+                                onPress={() => {
+                                    products.splice(i, 1)
+                                    setProducts([...products])
+                                    _storeData([...products])
+                                }}
+                            />
+                        }
+                    >
+                        <ListItem.Content style={styles.list}>
                             <ListItem.Title>{l["productName"]}</ListItem.Title>
                             <ListItem.Title>{l["price"]}</ListItem.Title>
-                            <Icon name='delete' onPress={() => {
-                                products.splice(i, 1)
-                                setProducts([...products])
-                                _storeData([...products])
-
-                            }} />
                         </ListItem.Content>
-                    </ListItem>
+                        <ListItem.Chevron />
+                    </ListItem.Swipeable>
                 ))
             }
         </View >
-    </ScrollView>
+    </ScrollView >
 }
 
-const styles = StyleSheet.create({
-    list: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between"
-    },
-    listItem: {
-        marginTop: 10
-    },
-    productList: {
-        padding: 10
-    },
-    btnsView: {
-        display: "flex",
-        flexDirection: "row"
-    },
-    test: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-around"
-    }
-});
 
 export default ProductsListComponent;

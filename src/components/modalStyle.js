@@ -67,6 +67,29 @@ export const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center"
+    },
+    list: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    listItem: {
+        marginTop: 10
+    },
+    productList: {
+        padding: 10
+    },
+    btnsView: {
+        display: "flex",
+        flexDirection: "row"
+    },
+    test: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-around"
+    },
+    product: {
+        marginTop: 2
     }
 
 });

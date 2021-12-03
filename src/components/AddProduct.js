@@ -82,6 +82,24 @@ export const AddProductComponent = ({ products, setProducts }) => {
                             />
                         }
                     />
+                    <Input
+                        placeholder='Product Buy Info'
+                        onChangeText={(e) => {
+                            setNewProduct({
+                                ...newProduct,
+                                info: e
+                            })
+                        }}
+                        value={newProduct.info}
+                        style={styles.input}
+                        leftIcon={
+                            <Icon
+                                name='info'
+                                size={18}
+                                color='#758087e8'
+                            />
+                        }
+                    />
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
                         onPress={() => {
